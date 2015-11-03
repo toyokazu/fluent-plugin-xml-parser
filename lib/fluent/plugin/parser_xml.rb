@@ -13,14 +13,15 @@ module Fluent
       #
       # attr_xpaths indicates attribute name of the target value. Each array with two strings
       # means xpath of the attribute name and the attribute of the XML element (name, text etc).
-      # XPath can be omitted as 'nil' and specify your own attribute name as the second
+      # XPath can be omitted as 'null' and specify your own attribute name as the second
       # parameter.
       # 
       # value_xpaths indicates the target value to be extracted. Each array with two strings
       # means xpath of the target value and the attribute of the XML element (name, text etc).
-      # XPath can be omitted as 'nil' and specify your own value as the second parameter.
+      # XPath can be omitted as 'null' and specify your own value as the second parameter.
       #
       # You can check your own XML data structure by using irb or pry
+      #
       # require 'rexml/document'
       # doc = REXML::Document.new(open("test.xml"))
       # doc.elements['cap:alert/cap:info'].children
@@ -44,31 +45,40 @@ module Fluent
       # If this is the in_tail plugin, it would be a line. If this is for in_syslog,
       # it is a single syslog message.
       def parse(text)
-        doc = REXML::Document.new(text)
-        record = {}
-        attrs = @attr_xpaths.map do |attr_xpath|
-          if attr_xpath[0].nil? # when null is specified
-            attr_xpath[1] # second parameter is used as the attribute name
-          else # otherwise, the target attribute name is extracted from XML
-            doc.elements[attr_xpath[0]].method(attr_xpath[1]).call
+        begin
+          doc = REXML::Document.new(text)
+          $log.debug doc
+          record = {}
+          attrs = @attr_xpaths.map do |attr_xpath|
+            if attr_xpath[0].nil? # when null is specified
+              attr_xpath[1] # second parameter is used as the attribute name
+            else # otherwise, the target attribute name is extracted from XML
+              doc.elements[attr_xpath[0]].method(attr_xpath[1]).call
+            end
           end
-        end
-        values = @value_xpaths.map do |value_xpath|
-          if attr_xpath[0].nil? # when null is specified
-            attr_xpath[1] # second parameter is used as the target value
-          else # otherwise, the target value is extracted from XML
-            doc.elements[value_xpath[0]].method(value_xpath[1]).call
+          values = @value_xpaths.map do |value_xpath|
+            if value_xpath[0].nil? # when null is specified
+              value_xpath[1] # second parameter is used as the target value
+            else # otherwise, the target value is extracted from XML
+              doc.elements[value_xpath[0]].method(value_xpath[1]).call
+            end
           end
-        end
-        attrs.size.times do |i|
-          if i == 0 # time value
-            @time = @time_parser.parse(values[i])
-            record[attrs[i]] = @time
-          else
-            record[attrs[i]] = values[i]
+          attrs.size.times do |i|
+            if i == 0 # time value
+              @time = @time_parser.parse(values[i])
+              record[attrs[i]] = @time
+            else
+              record[attrs[i]] = values[i]
+            end
           end
+          yield @time, record
+        rescue REXML::ParseException => e
+          $log.warn "Parse error", :error => e.to_s
+          $log.debug_backtrace(e.backtrace)
+        rescue Exception => e
+          $log.warn "error", :error => e.to_s
+          $log.debug_backtrace(e.backtrace)
         end
-        yield @time, record
       end
 
       def json_parse message
