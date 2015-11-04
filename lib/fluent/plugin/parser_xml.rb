@@ -8,8 +8,9 @@ module Fluent
       # How to specify the target attributes and values
       # The followings are an example description for Libelium SmartCity sensor data.
       #
-      # attr_xpaths '[[null, "@timestamp"], ["cap:alert/cap:info/cap:parameter/cap:valueName", "text"], [null, "location"]]'
-      # value_xpaths '[["cap:alert/cap:info/cap:onset", "text"], ["cap:alert/cap:info/cap:parameter/cap:value", "text"], [null, "Kyoto"]]'
+      # time_xpath '["cap:alert/cap:info/cap:onset", "text"]'
+      # attr_xpaths '[[null, "description"], ["cap:alert/cap:info/cap:parameter/cap:valueName", "text"]]'
+      # value_xpaths '[["cap:alert/cap:info/cap:description", "text"], ["cap:alert/cap:info/cap:parameter/cap:value", "text"]]'
       #
       # attr_xpaths indicates attribute name of the target value. Each array with two strings
       # means xpath of the attribute name and the attribute of the XML element (name, text etc).
@@ -26,6 +27,7 @@ module Fluent
       # doc = REXML::Document.new(open("test.xml"))
       # doc.elements['cap:alert/cap:info'].children
       #
+      config_param :time_xpath, :string, :default => '[]'
       config_param :attr_xpaths, :string, :default => '[]'
       config_param :value_xpaths, :string, :default => '[]'
       config_param :time_format, :string, :default => nil # time_format is configurable
@@ -33,6 +35,7 @@ module Fluent
       def configure(conf)
         super
 
+        @time_xpath = json_parse(conf['time_xpath'])
         @attr_xpaths = json_parse(conf['attr_xpaths'])
         @value_xpaths = json_parse(conf['value_xpaths'])
         @time_format = conf['time_format']
@@ -48,6 +51,8 @@ module Fluent
         begin
           doc = REXML::Document.new(text)
           $log.debug doc
+          # parse time field
+          @time = @time_parser.parse(doc.elements[@time_xpath[0]].method(@time_xpath[1]).call)
           record = {}
           attrs = @attr_xpaths.map do |attr_xpath|
             if attr_xpath[0].nil? # when null is specified
@@ -64,12 +69,7 @@ module Fluent
             end
           end
           attrs.size.times do |i|
-            if i == 0 # time value
-              @time = @time_parser.parse(values[i])
-              record[attrs[i]] = @time
-            else
-              record[attrs[i]] = values[i]
-            end
+            record[attrs[i]] = values[i]
           end
           yield @time, record
         rescue REXML::ParseException => e

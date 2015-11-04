@@ -31,11 +31,15 @@ The followings are an example description for Libelium SmartCity sensor data.
   bind 127.0.0.1
   port 1883
   format xml
-  attr_xpaths '[[null, "@timestamp"], ["cap:alert/cap:info/cap:parameter/cap:valueName", "text"], [null, "location"]]'
-  value_xpaths '[["cap:alert/cap:info/cap:onset", "text"], ["cap:alert/cap:info/cap:parameter/cap:value", "text"], [null, "Kyoto"]]'
+  time_xpath '["cap:alert/cap:info/cap:onset", "text"]'
+  attr_xpaths '[[null, "description"], ["cap:alert/cap:info/cap:parameter/cap:valueName", "text"]]'
+  value_xpaths '[["cap:alert/cap:info/cap:description", "text"], ["cap:alert/cap:info/cap:parameter/cap:value", "text"]]'
 </source>
 
 ```
+
+time_xpath specifies timestamp filed value. An array with two strings means xpath of
+the value and the attribute of the XML element (name, text etc).
 
 attr_xpaths indicates attribute name of the target value. Each array with two strings
 means xpath of the attribute name and the attribute of the XML element (name, text etc).
@@ -45,6 +49,8 @@ parameter.
 value_xpaths indicates the target value to be extracted. Each array with two strings
 means xpath of the target value and the attribute of the XML element (name, text etc).
 XPath can be omitted as 'null' and specify your own value as the second parameter.
+
+The extracted fields are packed into Hash structure (record field) to emit the next procedure in fluentd.
 
 You can check your own XML data structure by using irb or pry
 
