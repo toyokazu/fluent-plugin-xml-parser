@@ -29,10 +29,9 @@ module Fluent
       #
       config_param :time_xpath, :string, :default => nil
       config_param :time_key, :string, :default => nil
-      config_param :time_format, :string, :default => nil
+      config_param :time_format, :string, :default => nil # time_format is configurable
       config_param :attr_xpaths, :string, :default => '[]'
       config_param :value_xpaths, :string, :default => '[]'
-      config_param :time_format, :string, :default => nil # time_format is configurable
       # This method is called after config_params have read configuration parameters
       def configure(conf)
         super
