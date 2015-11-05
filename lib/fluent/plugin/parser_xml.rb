@@ -27,7 +27,9 @@ module Fluent
       # doc = REXML::Document.new(open("test.xml"))
       # doc.elements['cap:alert/cap:info'].children
       #
-      config_param :time_xpath, :string, :default => '[]'
+      config_param :time_xpath, :string, :default => nil
+      config_param :time_key, :string, :default => nil
+      config_param :time_format, :string, :default => nil
       config_param :attr_xpaths, :string, :default => '[]'
       config_param :value_xpaths, :string, :default => '[]'
       config_param :time_format, :string, :default => nil # time_format is configurable
@@ -36,12 +38,13 @@ module Fluent
         super
 
         @time_xpath = json_parse(conf['time_xpath'])
+        @time_key = conf['time_key']
+        @time_format = conf['time_format']
+        @time_parser = TimeParser.new(@time_format)
         @attr_xpaths = json_parse(conf['attr_xpaths'])
         @value_xpaths = json_parse(conf['value_xpaths'])
-        @time_format = conf['time_format']
         # TimeParser class is already given. It takes a single argument as the time format
         # to parse the time string with.
-        @time_parser = TimeParser.new(@time_format)
       end
 
       # This is the main method. The input "text" is the unit of data to be parsed.
@@ -52,8 +55,15 @@ module Fluent
           doc = REXML::Document.new(text)
           $log.debug doc
           # parse time field
-          @time = @time_parser.parse(doc.elements[@time_xpath[0]].method(@time_xpath[1]).call)
+          if @time_xpath.nil?
+            @time = Fluent::Engine.now
+          else
+            @time = @time_parser.parse(doc.elements[@time_xpath[0]].method(@time_xpath[1]).call)
+          end
           record = {}
+          if !@time_key.nil?
+            record = {@time_key => format_time(@time)}
+          end
           attrs = @attr_xpaths.map do |attr_xpath|
             if attr_xpath[0].nil? # when null is specified
               attr_xpath[1] # second parameter is used as the attribute name
@@ -78,6 +88,14 @@ module Fluent
         rescue Exception => e
           $log.warn "error", :error => e.to_s
           $log.debug_backtrace(e.backtrace)
+        end
+      end
+
+      def format_time(time)
+        if @time_format.nil?
+          Time.at(time).iso8601
+        else
+          Time.at(time).strftime(@time_format)
         end
       end
 
