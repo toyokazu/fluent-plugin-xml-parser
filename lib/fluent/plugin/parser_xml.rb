@@ -36,7 +36,11 @@ module Fluent
       def configure(conf)
         super
 
-        @time_xpath = json_parse(conf['time_xpath'])
+        if conf['time_xpath'].nil?
+          @time_xpath = nil
+        else
+          @time_xpath = json_parse(conf['time_xpath'])
+        end
         @time_key = conf['time_key']
         @time_format = conf['time_format']
         @time_parser = TimeParser.new(@time_format)
