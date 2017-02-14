@@ -42,6 +42,36 @@ The followings are an example configuration for reformatting Libelium SmartCity 
 
 ```
 
+The target XML file of this example is as follows (an old style of Libelium sensor data):
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<cap:alert xmlns:cap="urn:oasis:names:tc:emergency:cap:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:emergency:cap:1.2 CAP-v1.2-os.xsd">
+  <cap:identifier>Libelium_2015-09-21T18:54:24+:00:00495</cap:identifier>
+  <cap:sender>Libelium_SmartCity_387243170</cap:sender>
+  <cap:sent>2015-09-21T18:54:24+:00:00</cap:sent>
+  <cap:status>Actual</cap:status>
+  <cap:msgType>Alert</cap:msgType>
+  <cap:scope>Public</cap:scope>
+  <cap:code>KPI</cap:code>
+  <cap:info>
+    <cap:category>Other</cap:category>
+    <cap:event>Libelium</cap:event>
+    <cap:urgency>Inmediate</cap:urgency>
+    <cap:severity>Unknown</cap:severity>
+    <cap:certainty>Observed</cap:certainty>
+    <cap:onset>2015-09-21T18:54:24+:00:00</cap:onset>
+    <cap:senderName>Libelium</cap:senderName>
+    <cap:headline>Waspmote sensors</cap:headline>
+    <cap:description>Sensor data from Waspmote devices: MCP</cap:description>
+    <cap:parameter>
+      <cap:valueName>MCP</cap:valueName>
+      <cap:value>50</cap:value>
+    </cap:parameter>
+  </cap:info>
+</cap:alert>
+```
+
 Configurable options are the following:
 
 - **time_xpath**: A value for fluentd time field. An array with two strings means xpath of
