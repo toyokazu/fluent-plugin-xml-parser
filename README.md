@@ -84,12 +84,14 @@ Configurable options are the following:
 - **attr_xpaths**: indicates attribute name of the target value. Each array with two strings
   means xpath of the attribute name and the attribute of the XML element (name, text etc).
   XPath can be omitted as 'null' and specify your own attribute name as the second
-  parameter.
+  parameter. A third element in the array can be used to provide a default value if the XML
+  element is missing.
 - **value_xpaths**: indicates the target value to be extracted. Each array with two strings
   means xpath of the target value and the attribute of the XML element (name, text etc) and
   each value is stored into the Hash with the key specified at an array instance in the
   **attr_xpaths** with the same index. XPath can be omitted as 'null' and specify your own
-  value as the second parameter.
+  value as the second parameter. A third element in the array can be used to provide a
+  default value if the XML element is missing.
 
 The extracted fields are packed into Hash structure (record field) to emit the next procedure in fluentd.
 

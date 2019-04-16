@@ -71,14 +71,24 @@ module Fluent
             if attr_xpath[0].nil? # when null is specified
               attr_xpath[1] # second parameter is used as the attribute name
             else # otherwise, the target attribute name is extracted from XML
-              doc.elements[attr_xpath[0]].method(attr_xpath[1]).call
+              el = doc.elements[attr_xpath[0]]
+              unless el.nil? and attr_xpath.size > 2 
+                el.method(attr_xpath[1]).call
+              else # unless it's not in the XML and we have a third parameter
+                attr_xpath[2] # then the third parameter is used as the target value
+              end
             end
           end
           values = @value_xpaths.map do |value_xpath|
             if value_xpath[0].nil? # when null is specified
               value_xpath[1] # second parameter is used as the target value
             else # otherwise, the target value is extracted from XML
-              doc.elements[value_xpath[0]].method(value_xpath[1]).call
+              el = doc.elements[value_xpath[0]]
+              unless el.nil? and value_xpath.size > 2 
+                el.method(value_xpath[1]).call
+              else # unless it's not in the XML and we have a third parameter
+                value_xpath[2] # then the third parameter is used as the target value
+              end
             end
           end
           attrs.size.times do |i|
