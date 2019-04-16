@@ -5,8 +5,8 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 Gem::Specification.new do |spec|
   spec.name          = "fluent-plugin-xml-parser"
   spec.version       = "0.0.7"
-  spec.authors       = ["Toyokazu Akiyama"]
-  spec.email         = ["toyokazu@gmail.com"]
+  spec.authors       = ["Toyokazu Akiyama", "Brendan McGrath"]
+  spec.email         = ["toyokazu@gmail.com", "brendan@redmandi.com"]
   spec.summary       = %q{fluentd xml parser plugin}
   spec.description   = %q{fluentd xml parser plugin}
   spec.homepage      = "http://github.com/toyokazu/fluent-plugin-xml-parser"
