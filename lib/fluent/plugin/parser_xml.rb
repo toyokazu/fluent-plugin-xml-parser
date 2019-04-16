@@ -60,9 +60,9 @@ module Fluent
           $log.debug doc
           # parse time field
           if @time_xpath.nil?
-            @time = Fluent::Engine.now
+            time = Fluent::Engine.now
           else
-            @time = @time_parser.parse(doc.elements[@time_xpath[0]].method(@time_xpath[1]).call)
+            time = @time_parser.parse(doc.elements[@time_xpath[0]].method(@time_xpath[1]).call)
           end
           record = {}
           if !@time_key.nil?
@@ -95,7 +95,7 @@ module Fluent
           attrs.size.times do |i|
             record[attrs[i]] = values[i]
           end
-          yield @time, record
+          yield time, record
         rescue REXML::ParseException => e
           $log.warn "Parse error", :error => e.to_s
           $log.debug_backtrace(e.backtrace)
