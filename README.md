@@ -2,6 +2,13 @@
 
 Fluent plugin for Parsing XML Input
 
+## Requirements
+
+| fluent-plugin-xml-parser  | Fluentd     | Ruby   |
+|---------------------------|-------------|--------|
+| >= 1.0.0                  | >= v0.14.0  | >= 2.1 |
+| < 1.0.0                   | >= v0.12.0  | >= 1.9 |
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -24,6 +31,33 @@ In order to enable Fluent::Plugin::XmlParser, 'format xml' option needs to be
 specified at 'source' directive.
 
 The followings are an example configuration for reformatting Libelium SmartCity sensor data to fit ElasticSearch received via MQTT protocol([fluent-plugin-mqtt-io](https://github.com/toyokazu/fluent-plugin-mqtt-io)).
+
+### For v1.0
+
+Put configuration options in `<parse>` tag
+
+```
+
+<source>
+  type mqtt
+  bind 127.0.0.1
+  port 11883
+  topic 'Libelium/+/#'
+  @label @MQTT_OUT
+  <parse>
+    type @xml
+    time_xpath '["cap:alert/cap:info/cap:onset", "text"]'
+    time_key '@timestamp'
+    attr_xpaths '[["cap:alert/cap:info/cap:parameter/cap:valueName", "text"]]'
+    value_xpaths '[["cap:alert/cap:info/cap:parameter/cap:value", "text"]]'
+  </parse>
+</source>
+
+```
+
+### For v0.12
+
+Use `format` instead of `<parse></parse` and put configuration options in `<source>` tag
 
 ```
 
