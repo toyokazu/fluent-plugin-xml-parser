@@ -40,7 +40,7 @@ module Fluent::Plugin
       if conf['time_xpath'].nil?
         @time_xpath = nil
       else
-        @time_xpath = json_parse(conf['time_xpath'])
+        @time_xpath = json_parse(@time_xpath)
       end
       @time_parser = Fluent::TimeParser.new(@time_format)
       @attr_xpaths = json_parse(@attr_xpaths)
