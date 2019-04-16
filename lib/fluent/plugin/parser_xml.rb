@@ -1,3 +1,4 @@
+require 'fluent/parser'
 require 'rexml/document'
 module Fluent
   class TextParser
