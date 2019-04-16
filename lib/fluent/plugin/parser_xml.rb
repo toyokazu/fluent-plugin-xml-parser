@@ -1,10 +1,10 @@
-require 'fluent/parser'
+require 'fluent/plugin/parser'
 require 'rexml/document'
-module Fluent
-  class TextParser
+
+module Fluent::Plugin
     class XmlParser < Parser
       # Register this parser as "xml"
-      Plugin.register_parser("xml", self)
+      Fluent::Plugin.register_parser("xml", self)
 
       # How to specify the target attributes and values
       # The followings are an example description for Libelium SmartCity sensor data.
@@ -123,5 +123,4 @@ module Fluent
         end
       end
     end
-  end
 end
