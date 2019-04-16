@@ -42,11 +42,9 @@ module Fluent::Plugin
         else
           @time_xpath = json_parse(conf['time_xpath'])
         end
-        @time_key = conf['time_key']
-        @time_format = conf['time_format']
-        @time_parser = TimeParser.new(@time_format)
-        @attr_xpaths = json_parse(conf['attr_xpaths'])
-        @value_xpaths = json_parse(conf['value_xpaths'])
+        @time_parser = Fluent::TimeParser.new(@time_format)
+        @attr_xpaths = json_parse(@attr_xpaths)
+        @value_xpaths = json_parse(@value_xpaths)
         # TimeParser class is already given. It takes a single argument as the time format
         # to parse the time string with.
       end
